@@ -18,53 +18,7 @@ Multiple projects and environments are a fundamental part of HashBrown's structu
 
 ### Docker
 
-The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags).
-
-Example `docker-compose.yml` setup:
-
-```yaml
-version: "3.4"
-
-networks:
-    example--network: ~
-    
-services:
-    cms:
-        image: hashbrowncms/hashbrowncms
-        container_name: "example--cms"
-        ports:
-            - 8080:8080
-        depends_on:
-            - mongodb
-        networks:
-            - example--network
-        restart: unless-stopped
-        environment:
-            - MONGODB_HOST=mongodb
-        volumes:
-            - "./storage:/srv/app/storage" # For content and media
-            - "./plugins:/srv/app/plugins" # For custom code
-
-    mongodb:
-        image: mongo
-        container_name: "example--mongodb"
-        networks:
-            - example--network
-        restart: unless-stopped
-        volumes:
-            - "./db:/data/db"
-
-    website:
-        image: node
-        container_name: "example--website"
-        command: node /srv/app/src/index.js
-        ports:
-            - 80:80
-        volumes:
-            - "./website:/srv/app/src" # The website server code
-            - "./storage/website/live/content:/srv/app/content" # Content files to be presented by the website
-            - "./storage/website/live/media:/srv/app/public/media" # Public directory for media files
-```
+The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags). An example setup can be found [here](/guides/docker) 
 
 ### Installing
 
