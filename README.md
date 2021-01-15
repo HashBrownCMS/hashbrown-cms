@@ -9,7 +9,12 @@ A free and open-source headless CMS built with Node.js and MongoDB
 - [API documentation](https://hashbrowncms.org/docs/api/)
 - [Developer documentation](https://hashbrowncms.org/docs/src/)
 
+## Docker
+
+The easiest way to get up and running is to use the HashBrown CMS [Docker](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags) images. For persistent storage, you can define volumes for the `/srv/app/storage` and `/srv/app/plugins` folders.
+
 ## Installing HashBrown
+
 First make sure you have these dependencies met:  
 - node.js
 - mongodb
@@ -26,6 +31,7 @@ npm install
 ```
 
 ## Running HashBrown
+
 Building and starting the server for production:
 ```
 npm start
@@ -52,6 +58,7 @@ npm run watch:nodemon
 ```
 
 ## Updating HashBrown
+
 To update the core HashBrown version and all of its dependencies:
 ```
 npm run update
