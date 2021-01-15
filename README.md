@@ -49,6 +49,7 @@ services:
 
     website:
         image: node
+        container_name: "example--website"
         command: node /srv/app/src/index.js
         ports:
             - 80:80
