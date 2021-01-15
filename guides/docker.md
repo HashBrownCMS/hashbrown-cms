@@ -35,7 +35,7 @@ services:
             - "./db:/data/db"
 
     # A live environment for website #1
-    website-1-live:
+    website_1_live:
         image: node
         container_name: "example--website-1-live"
         command: node /srv/app/src/index.js
@@ -47,7 +47,7 @@ services:
             - "./storage/website_1/live/media:/srv/app/public/media" # Public directory for media files
     
     # A staging environment for website #1
-    website-1-staging:
+    website_1_staging:
         image: node
         container_name: "example--website-1-staging"
         command: node /srv/app/src/index.js
@@ -59,7 +59,7 @@ services:
             - "./storage/website_1/staging/media:/srv/app/public/media"
     
     # A live environment for website #2
-    website-2-live:
+    website_2_live:
         image: node
         container_name: "example--website-2-live"
         command: node /srv/app/src/index.js
@@ -71,7 +71,7 @@ services:
             - "./storage/website_2/live/media:/srv/app/public/media"
     
     # A staging environment for website #2
-    website-2-staging:
+    website_2_staging:
         image: node
         container_name: "example--website-2-staging"
         command: node /srv/app/src/index.js
