@@ -11,7 +11,53 @@ A free and open-source headless CMS built with Node.js and MongoDB
 
 ## Docker
 
-The easiest way to get up and running is to use the HashBrown CMS [Docker](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags) images. For persistent storage, you can define volumes for the `/srv/app/storage` and `/srv/app/plugins` folders.
+The easiest way to get up and running is to use the HashBrown CMS [Docker](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags) images.
+
+Example `docker-compose.yml` setup:
+
+```yaml
+version: "3.4"
+
+networks:
+    example--network: ~
+    
+services:
+    cms:
+        image: hashbrowncms/hashbrowncms
+        container_name: "example--cms"
+        ports:
+            - 8080:8080
+        depends_on:
+            - mongodb
+        networks:
+            - example--network
+        restart: unless-stopped
+        environment:
+            - MONGODB_HOST=mongodb
+        volumes:
+            - "./storage:/srv/app/storage" # For content and media
+            - "./plugins:/srv/app/plugins" # For custom code
+
+    mongodb:
+        image: mongo
+        container_name: "example--mongodb"
+        networks:
+            - example--network
+        restart: unless-stopped
+        volumes:
+            - "./db:/data/db"
+
+    website:
+        image: node
+        command: node /srv/app/src/index.js
+        ports:
+            - 80:80
+        volumes:
+            - "./website:/srv/app/src" # The website server code
+            - "./storage/website/live/content:/srv/app/content" # Content files to be presented by the website
+            - "./storage/website/live/media:/srv/app/public/media" # Public directory for media files
+```
+For persistent storage, you can define volumes for the `/srv/app/storage` and `/srv/app/plugins` folders.
 
 ## Installing HashBrown
 
