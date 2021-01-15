@@ -11,7 +11,7 @@ A free and open-source headless CMS built with Node.js and MongoDB
 
 ## Docker
 
-The easiest way to get up and running is to use the HashBrown CMS [Docker](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags) images.
+The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags).
 
 Example `docker-compose.yml` setup:
 
