@@ -18,7 +18,7 @@ Multiple projects and environments are a fundamental part of HashBrown's structu
 
 ### Docker
 
-The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags). An example setup can be found [here](/guides/docker) 
+The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags). An example setup can be found [here](https://hashbrowncms.org/guides/docker).
 
 ### Installing
 
