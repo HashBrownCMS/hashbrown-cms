@@ -57,7 +57,6 @@ services:
             - "./storage/website/live/content:/srv/app/content" # Content files to be presented by the website
             - "./storage/website/live/media:/srv/app/public/media" # Public directory for media files
 ```
-For persistent storage, you can define volumes for the `/srv/app/storage` and `/srv/app/plugins` folders.
 
 ## Installing HashBrown
 
