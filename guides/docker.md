@@ -1,6 +1,6 @@
 # Docker
 
-An extensive example running multiple websites and environments sugin docker-compose
+An extensive example running multiple websites and environments using docker-compose
 
 ```yaml
 version: "3.4"
@@ -59,9 +59,9 @@ services:
             - "./storage/website_1/staging/media:/srv/app/public/media"
     
     # A live environment for website #2
-    website-1-live:
+    website-2-live:
         image: node
-        container_name: "example--website-1-live"
+        container_name: "example--website-2-live"
         command: node /srv/app/src/index.js
         ports:
             - 1002:80
