@@ -4,7 +4,7 @@ A free and open-source headless CMS built with Node.js and MongoDB
 
 ![HashBrown CMS](https://hashbrowncms.org/img/screenshot.jpg)
 
-Multiple projects and environments are supported, so you only need one running CMS for all of your website needs
+Multiple projects and environments are a fundamental part of HashBrown's structure, so you only need one CMS for all of your website needs.
 
 ![HashBrown CMS](https://hashbrowncms.org/img/diagram.svg)
 
