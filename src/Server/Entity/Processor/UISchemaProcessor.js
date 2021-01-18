@@ -96,6 +96,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                     parsed['@type'] = 'MediaObject';
                 }
 
+                parsed['identifier'] = media.id;
                 parsed['author'] = media.author;
 
                 if(parsed['author']) {
@@ -126,6 +127,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 for(let key in content) {
                     parsed[key] = content[key];
                 }
+
                 break;
         }
        
