@@ -20,6 +20,8 @@ Multiple projects and environments are a fundamental part of HashBrown's structu
 
 The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags). An example setup can be found [here](https://hashbrowncms.org/guides/docker).
 
+The `latest` and `develop` images will automatically update themselves every time they're restarted.
+
 ### Installing
 
 First make sure you have these dependencies met:  
@@ -67,6 +69,7 @@ npm run watch:nodemon
 ### Updating
 
 To update the core HashBrown version and all of its dependencies:
+
 ```
 npm run update
 ```
