@@ -238,14 +238,6 @@ class Media extends require('Common/Entity/Resource/Media') {
         checkParam(context, 'context', HashBrown.Entity.Context, true);
         checkParam(options, 'options', Object, true);
        
-        // First attempt to get the files on disk
-        let files = [];
-        let deployer = await this.getDeployer(context);
-
-        if(deployer) {
-            files = await deployer.getFolder(deployer.getPath(), 2) || [];
-        }
-
         // Get resources from database
         let resources = await super.list(context, options);
 
@@ -256,6 +248,14 @@ class Media extends require('Common/Entity/Resource/Media') {
             resourceMap[resource.id] = resource;
         }
 
+        // Get the files on disk
+        let files = [];
+        let deployer = await this.getDeployer(context);
+
+        if(deployer) {
+            files = await deployer.getFolder(deployer.getPath(), 2) || [];
+        }
+
         // Associate resources with files
         for(let file of files) {
             let id = Path.basename(Path.dirname(file));
@@ -263,7 +263,11 @@ class Media extends require('Common/Entity/Resource/Media') {
 
             if(filename === 'thumbnail.jpg') { continue; }
 
+            // Create temporary resource, if it doesn't exist in the database
             if(!resourceMap[id]) {
+                // If we're looking for media inside a non-root folder, skip resources not in the database
+                if(options.folder && options.folder !== '/') { continue; }
+
                 resourceMap[id] = new Media({ id: id, context: context });
             }
 

@@ -39,6 +39,31 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     }
 
     /**
+     * Event Click rename folder
+     *
+     * @param {String} path
+     */
+    onClickRenameFolder(path) {
+        let parts = path.split('/').filter(Boolean);
+
+        let modal = HashBrown.Entity.View.Modal.Rename.new({
+            model: {
+                value: parts.pop()
+            }
+        });
+
+        modal.on('submit', async (name) => {
+            parts.push(name);
+
+            let newPath = '/' + parts.join('/');
+
+            await HashBrown.Service.RequestService.request('post', 'media/renameFolder', { from: path, to: newPath });
+            
+            HashBrown.Service.EventService.trigger('resource');
+        });
+    }
+
+    /**
      * Event: Click move
      */
     onClickMove(media) {
@@ -135,7 +160,18 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
 
         return options;
     }
-
+    
+    /**
+     * Gets the context menu options for this panel
+     *
+     * @return {Object} Options
+     */
+    getPanelOptions() {
+        return {
+            'Upload': () => this.onClickNew()
+        }
+    }
+    
     /**
      * Creates a folder
      *
@@ -146,23 +182,27 @@ class MediaPanel extends HashBrown.Entity.View.Panel.PanelBase {
     getParentItem(path) {
         if(!path) { return null; } 
 
+        let parts = path.split('/').filter(Boolean);
+        
+        path = '/' + parts.join('/');
+        
         if(this.state.itemMap[path]) { return this.state.itemMap[path]; }
 
-        let parts = path.split('/').filter(Boolean);
         let folderName = parts.pop();
 
         if(!folderName) { return null; }
         
-        let parentFolderPath = '/';
-
-        if(parts.length > 0) {
-            parentFolderPath += parts.join('/') + '/';
-        }
+        let parentFolderPath = '/' + parts.join('/');
 
         let item = HashBrown.Entity.View.ListItem.PanelItem.new({
             model: {
                 name: folderName,
                 id: path,
+                options: {
+                    'This folder': '---',
+                    'Upload': () => this.onClickNew(path),
+                    'Rename': () => this.onClickRenameFolder(path)
+                },
                 isDisabled: true,
                 isDropContainer: true,
                 icon: 'folder',
