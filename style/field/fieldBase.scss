@@ -16,7 +16,7 @@
         min-height: var(--size-widget-small);
 
         &::before, &::after {
-            margin-top: -var(--padding-small);
+            margin-top: -var(--padding-medium);
         }
     }
 
@@ -32,10 +32,10 @@
     }
 
     &__tools {
-        margin-right: var(--padding-small);
-        padding-right: var(--padding-small);
+        margin-right: var(--padding-medium);
+        padding-right: var(--padding-medium);
         border-right: 1px solid var(--color-default-200); 
-        min-width: calc(var(--size-widget-small) + var(--padding-small));
+        min-width: calc(var(--size-widget-small) + var(--padding-medium));
         flex-shrink: 0;
 
         &:empty {
@@ -45,13 +45,13 @@
 
     &__tool {
         &:not(:last-child) {
-            margin: 0 0 var(--padding-small) 0;
+            margin: 0 0 var(--padding-medium) 0;
         }
     }
 
     &__key {
         line-height: var(--size-widget-small);
-        margin-bottom: var(--padding-small);
+        margin-bottom: var(--padding-medium);
         overflow: hidden;
 
         &__label {
