@@ -333,7 +333,7 @@ class Media extends require('Common/Entity/Resource/Media') {
         
         // If no thumbnail was specified, attempt to generate one
         } else if(options.full && options.filename) {
-            let thumbnail = await this.generateThumbnail(this.context, options.filename, Buffer.from(options.full, 'base64'));
+            let thumbnail = await this.constructor.generateThumbnail(this.context, options.filename, Buffer.from(options.full, 'base64'));
            
             if(thumbnail) {
                 await deployer.setFile(deployer.getPath(this.id, 'thumbnail.jpg'), thumbnail.toString('base64'));
