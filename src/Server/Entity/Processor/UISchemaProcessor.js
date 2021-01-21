@@ -177,8 +177,8 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         let data = {};
        
         data['@type'] = schema.id;
-        data['@parentId'] = content.parentId;
         data['identifier'] = content.id;
+        data['parentIdentifier'] = content.parentId;
         
         for(let key in schema.config) {
             data[key] = await this.check(
