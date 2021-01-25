@@ -56,33 +56,6 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         
         // Meta tab
         if(this.state.tab === 'meta') {
-            contentFields = {
-                publishOn: this.model.publishOn,
-                unpublishOn: this.model.unpublishOn,
-                schemaId: this.model.schemaId
-            };
-
-            schemaFields = {
-                publishOn: {
-                    label: 'Publish on',
-                    schemaId: 'date',
-                    tabId: 'meta'
-                },
-                unpublishOn: {
-                    label: 'Unpublish on',
-                    schemaId: 'date',
-                    tabId: 'meta'
-                },
-                schemaId: {
-                    label: 'Schema',
-                    schemaId: 'contentSchemaReference',
-                    tabId: 'meta',
-                    config: {
-                        allowedSchemas: await this.getAllowedSchemas()
-                    }
-                }
-            };
-            
             // Locales publishing
             if(this.context.project.settings.locales.length > 1) {
                 contentFields.publishIn = this.model.publishIn.length > 0 ? this.model.publishIn : this.context.project.settings.locales;
@@ -96,6 +69,31 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                     }
                 };
             }
+            
+            contentFields.publishOn = this.model.publishOn;
+            contentFields.unpublishOn = this.model.unpublishOn;
+            contentFields.schemaId = this.model.schemaId;
+
+            schemaFields.publishOn = {
+                label: 'Publish on',
+                schemaId: 'date',
+                tabId: 'meta'
+            };
+
+            schemaFields.unpublishOn = {
+                label: 'Unpublish on',
+                schemaId: 'date',
+                tabId: 'meta'
+            };
+
+            schemaFields.schemaId = {
+                label: 'Schema',
+                schemaId: 'contentSchemaReference',
+                tabId: 'meta',
+                config: {
+                    allowedSchemas: await this.getAllowedSchemas()
+                }
+            };
 
         // Any other tab
         } else {
