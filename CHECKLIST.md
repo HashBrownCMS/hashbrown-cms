@@ -1,287 +1,254 @@
-This is a checklist for manual UI testing
+This is a checklist for manual testing
 
-# Login
+Pages
+====================
 
-*   Logging in
-*   Upon first time setup, a user can create an admin account
+## Login
 
-# Dashboard
+* Users can log in with their username and password
+* Upon first time setup, a user can create an admin account
 
-*   Can log out
+## Dashboard
 
-## Projects
-
-*   Admin related content appears
-*   Can delete a project
-*   Can create a new project
-
-### Project
-
-*   Name is correct
-*   Amount of users is correct
-*   Amount of languages is correct
-
-#### Info
-
-*   Can change the project name
-
-#### Languages
-
-*   Can change languages
-
-#### Backups
-
-*   List of backups appear
-*   Can upload a new backup
-*   Can create a new backup
-*   Can download an existing backup
-*   Can restore an existing backup
-*   Can delete an existing backup
-
-#### Migration
-
-*   All types are migrated correctly
-*   Content is overwritten on target if intended
-
-#### Sync
-
-*   Can enable/disable sync
-*   Can input API URL
-*   Can generate API token
-*   Can specify remote project
-
-#### Environments
-
-*   Amount is correct
-*   Can add a new environment
-*   Can delete an existing environment
+* Users can log out
+    * Clears cookies
+    * Removes user session from database
+* Users can open the user settings modal
+* Admins
+    * Can create a new project
+    * Can see list of users
+    * Can see server info
 
 ## Users
 
-*   Can create a new user
-    *   Can create without inviting through email
-    *   Can invite through email
-*   Can delete an existing user
-
-### Edit user
-
-*   Can change username
-*   Can change full name
-*   Can change email
-*   Can change password
-*   Can set as admin
-*   Can modify scopes for all projects
+* Can create a new user
+    * Can create without inviting via email
+    * Can invite via email
 
 ## Server
 
-*   Information is correct
+* Information is correct
+* Plugins are listed
 
-## Log out
 
-*   Clears cookies
-*   Removes user session from database
+Modals
+====================
 
-## Update
+## MigrateEnvironments
 
-*   Version check is correct
+* All resource types are migrated correctly
 
-# Environment
+## ProjectBackups
 
-## Main menu
+* List of backups appears
+* Can upload a new backup
+* Can create a new backup
+* Can download an existing backup
+* Can restore an existing backup
+* Can delete an existing backup
 
-*   Can navigate to dashboard
-*   Can change user settings (see dashboard > user checklist)
-*   Can log out
-*   Can invoke the "help" modal
-    *   Context sensitive information is displayed in the modal
-*   Langage selector appears, if some than one language is selected
-*   Can change language
-    *   Navbar items are updated
-    *   Content currently being edited is being updated
+## ProjectSettings
 
-## Content
+* Information in fields is correct
+* Can enable sync and acquire tokens
+* Changes are saved correctly
 
-### Navbar
+## UserEditor
 
-*   Can create new Content
-    *   In the root
-    *   As a child of other Content, limited by Schema's allowed child Schemas
-*   Can copy the Content id
-*   Can pull Content from remote
-*   Can push Content to remote
-*   Can remove Content if it's local
-*   Can expand Content to see child Content
-*   Can move Content in between and nested under other nodes
-    *   The order is maintained upon reload
-*   Can change publishing settings
-    *   Apply settings to children
-    *   Connections appear as options
+* Can change username
+* Can change full name
+* Can change email
+* Can change password
+* Can set as admin
+* Can modify scopes for all projects
 
-### Editor
 
-*   Default tab for the Schema is routed to correctly
-*   Cannot edit Content that is locked or remote
-    *   There is no "save &" button
-    *   Fields are half transparent and not interactable
-*   Tabs are displaying correct fields as defined in the Schema
-*   Can save edited Content
-    *   Spinner icon and "working" text appears while in progress
-    *   Can publish
-    *   Can preview
-    *   Can unpublish
-    *   All publishing operations are performed through the associated Connections
-*   Publishing operations are hidden when no Connection is set in the Content's publishing settings
-*   Fields from parent Schemas are visible in the editor
+ListItems
+====================
 
-### Field types
+## Project
 
-*   Array
-    *   Can change Schema of an item
-    *   Can collapse all items
-    *   Can expand all items
-    *   Can sort items
-    *   All items are saved in correct order and with correct Schemas
-*   Date
-    *   Can define date with modal
-    *   Can delete date
-*   Dropdown
-    *   Options are displaying
-    *   Can pick options
-*   Language
-    *   Languages are displaying
-    *   Can pick a language
-*   Media reference
-    *   Can pick Media object from the MediaBrowser
-*   Content Schema Reference
-    *   Can pick ContentSchema
-*   Resource Reference
-    *   Resource is being displayed by label (like name, title or id)
-*   Rich Text
-    *   Value is stored in HTML form
-    *   Changing between HTML/Markdown and WYSIWYG doesn't trigger a change
-    *   Can insert Media from the MediaBrowser
-*   String
-    *   Can change string
-*   Struct
-    *   All correctly defined fields are displaying
-    *   If fields are defined incorrectly, an error message appears
-*   Tags
-    *   Can remove tags
-    *   Can add tags
-*   Content Reference
-    *   Can pick a Content node using the dropdown
-*   Boolean
-    *   Can toggle the switch on/off
-*   Url
-    *   Can change the URL
-    *   The editor is updated automatically upon changing the "title" field on a Page Schema
-*   Number
-    *   The field is limited to numbers
+* Information in fields is correct
+* Can add a new environment
+* Can delete an existing environment
+* Can open the MigrateEnvironments modal
+* Can delete project
 
-## Media
+## User
 
-### Navbar
+* Can delete an existing user
+* Can open the UserEditor modal
 
-*   Can upload new Media
-*   Can replace Media
-*   Can move Media into new folders
-*   Can copy the Media id
-*   Can remove Media
-*   Folder structure displays correctly
-    *   Expand/collapse toggle
-    *   Sorted alphabetically
 
-### Browser
+Navigation
+====================
 
-*   All media is displayed in folders
-*   Can upload new media
+## Session
 
-### Editor
+* Can navigate to dashboard
+* Can open the UserEditor modal
+* Can log out
+* Locale selector appears, if some than one locale is selected
+* Can change locale
+    * ResourceBrowser items are updated
+    * Content currently being edited is updated
 
-*   Can view SVG, image and video files
+## ResourceBrowser
 
-## Forms
+* Can create new resources
+* Can copy the resource id
+* Can pull the resource from remote
+* Can push the resource to remote
+* Can remove the resource if it's local
+* Can expand the resource to see children
 
-### Navbar
 
-*   Can copy Form id
-*   Can remove Form
-*   Can pull from remote
-*   Can push to remote
+Fields
+====================
 
-### Editor
+## ArrayEditor
 
-*   Can see amount of entries
-*   Can clear entires
-*   Can download entries as CSV
-*   Can see timestamps on all entries
-*   Can copy the generated POST URL
-*   Can change the title
-*   Can set the allowed origin
-*   Can set redirect URL
-*   Can toggle whether the redirect URL is appended
-*   Can define inputs
-    *   Can set input name
-    *   Can set input type
-    *   Can toggle "required" attribute
-    *   Can toggle "check for duplicates"
-    *   Can define regex pattern
-    *   Test form updates as fields are updated
+* Can change schema of an item
+* Can collapse all items
+* Can expand all items
+* Can sort items
+* All items are saved in correct order and with correct schemas
 
-### Submissions
+## BooleanEditor
 
-*   Submissions are only accepted from the allowed origin
-*   Submissions are timestamped
-*   Submissions enter the database correctly
-*   If a redirect is specified, it is carried out successfully upon submission
-    *   If the redirect is appended, it is done so as well
-*   If "check for duplicates" is checked, no duplicates are allowed
-*   If a regex pattern is defined, it is checked properly
+* Value is always saved as either true or false
 
-## Connections
+## ContentReferenceEditor
 
-### Publishing
+* Can pick content
 
-*   Can publish Content with every Connection type
-*   Can unpublish Content with every Connection type
-*   Can preview Content with every Connection type
-*   Can see and edit Media with every Connection type
+## ContentSchemaReferenceEditor
 
-### Navbar
+* Can pick content schema
 
-*   Can create new Connection
-*   Can copy Connection id
-*   Can remove Connection
-*   Can push Connection to remote
-*   Can pull Connection from remote
+## DateEditor
 
-### Editor
+* Can define date
+* Can clear date
 
-*   Can set as Media provider
-*   Can edit title
-*   Can edit URL
-*   Can change type
-    *   The types are loaded from plugins
-    *   Upon changing the type, the plugin editor renders immediately
-*   Can save changes
+## DropdownEditor
 
-## Schemas
+* Options are displaying
+* Can pick options
 
-### Navbar
+## LocaleEditor
 
-*   Schemas are divided into "Content Base" and "Field Base"
-*   Can copy Schema id
-*   Can create new child Schema
-*   Can pull Schema from remote
-*   Can push Schema to remote
-*   Can remove Schema
+* Locales are displaying
+* Can pick a locale
 
-### Editor
+## MediaReferenceEditor
 
-*   Can change name
-*   Can change icon
-*   Can change parent
-    *   Changes are reflected in the navbar immediately
-*   Can change field editor
-*   Can change config
-*   Can save changes
+* Can pick media from the MediaBrowser
+
+## NumberEditor
+
+* The field is limited to numbers
+
+## RichTextEditor
+
+* Value is stored in HTML format
+* Changing between HTML/Markdown and WYSIWYG doesn't trigger a change
+* Can insert media from the MediaBrowser
+
+## StringEditor
+
+* Can change string
+
+## StructEditor
+
+* All correctly defined fields are displaying
+* If fields are defined incorrectly, an error message appears
+
+## TagsEditor
+
+* Can remove tags
+* Can add tags
+
+## UrlEditor
+ 
+* Can change the URL
+* The editor is updated automatically upon changing the "title" field on the parent editor
+
+
+Content
+====================
+
+## ContentPanel
+
+* Can create new content
+    * In the root, if allowed in the schema
+    * As a child, if allowed by the parent schema
+* Can reparent content
+* Can copy the content id
+* Can remove content
+
+## ContentEditor
+
+* Fields are displayed in their appropriate tabs
+* Parent fields are displayed in content with inherited schemas
+* Values are saved correctly
+* The published checkbox publishes/redacts content as expected
+
+
+Media
+====================
+
+## MediaPanel
+
+* Can upload new media
+* Can replace media
+* Can move media into new folders
+* Can copy the media id
+* Can remove media
+* Folder structure displays correctly
+    * Expand/collapse toggle
+    * Sorted alphabetically
+
+### MediaEditor
+
+* Can view SVG, image and video files
+* Can change folder
+* Can change authoring and copyright information
+
+
+Publications
+====================
+
+## PublicationPanel
+
+* Can create new publications
+* Can copy the publication id
+* Can remove publication
+
+## PublicationEditor
+
+* Preview link points to the correct API publication endpoint
+* Output matches filtering criteria, if any are provided
+
+
+Schemas
+====================
+
+## SchemaPanel
+
+* Schemas are divided into "Content" and "Field"
+* Can copy schema id
+* Can create new child schema
+* Can pull schema from remote
+* Can push schema to remote
+* Can remove schema
+
+## SchemaEditor
+
+* Can change name
+* Can change icon
+* Can change parent
+    * Changes are reflected in the SchemaPanel immediately
+* Can change field editor
+* Can change config
+* Can save changes
