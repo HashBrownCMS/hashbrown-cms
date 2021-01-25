@@ -237,26 +237,38 @@
         &.top {
             top: var(--size-widget-small);
 
-            &::before { content: '\f0d8'; top: -0.9rem; }
+            &::before {
+                content: '\f0d8';
+                top: calc(-0.9rem + 1px);
+                text-shadow: 0 -1px 0 var(--color-default-200);
+            }
         }
 
         &.bottom {
             bottom: var(--size-widget-small);
             flex-direction: column-reverse;
     
-            &::before { content: '\f0d7'; bottom: -0.7rem; }
+            &::before {
+                content: '\f0d7';
+                bottom: calc(-0.8rem + 1px);
+                text-shadow: 0 1px 0 var(--color-default-200);
+            }
         }
 
         &.left {
             left: 0;
 
-            &::before { left: 0.5rem; }
+            &::before {
+                left: 0.5rem;
+            }
         }
         
         &.right {
             right: 0;
             
-            &::before { right: 0.5rem; }
+            &::before {
+                right: 0.5rem;
+            }
         }
     }
 
