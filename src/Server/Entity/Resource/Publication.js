@@ -128,7 +128,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         
         let content = await HashBrown.Entity.Resource.Content.get(this.context, contentId);
 
-        let locales = content.publishFor;
+        let locales = content.publishIn;
 
         if(!locales || locales.length < 1) {
             locales = await this.context.project.getLocales();
@@ -206,8 +206,8 @@ class Publication extends require('Common/Entity/Resource/Publication') {
             if(
                 !item.isPublished ||
                 (
-                    item.publishFor.length > 0 &&
-                    item.publishFor.indexOf(locale) < 0
+                    item.publishIn.length > 0 &&
+                    item.publishIn.indexOf(locale) < 0
                 )
             ) { continue; }
 

@@ -30,7 +30,7 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
         
         // Publishing
         this.def(Date, 'publishOn');
-        this.def(Array, 'publishFor', []);
+        this.def(Array, 'publishIn', []);
         this.def(Date, 'unpublishOn');
         this.def(Boolean, 'isPublished');
 
