@@ -54,6 +54,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
         let contentFields = {};
         let schemaFields = {};
         
+        // Meta tab
         if(this.state.tab === 'meta') {
             contentFields = {
                 publishOn: this.model.publishOn,
@@ -81,7 +82,22 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
                     }
                 }
             };
+            
+            // Locales publishing
+            if(this.context.project.settings.locales.length > 1) {
+                contentFields.publishFor = this.model.publishFor.length > 0 ? this.model.publishFor : this.context.project.settings.locales;
+                
+                schemaFields.publishFor = {
+                    label: 'Publish for',
+                    schemaId: 'locale',
+                    tabId: 'locales',
+                    config: {
+                        isMultiple: true 
+                    }
+                };
+            }
 
+        // Any other tab
         } else {
             contentFields = this.model.getObject().properties || {};
 

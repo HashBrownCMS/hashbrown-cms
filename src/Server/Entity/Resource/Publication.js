@@ -124,10 +124,15 @@ class Publication extends require('Common/Entity/Resource/Publication') {
     async deployContent(contentId) {
         checkParam(contentId, 'contentId', String, true);
        
-        if(!this.canDeploy()) { console.log('FAIL'); return; }
+        if(!this.canDeploy()) { return; }
         
-        let locales = await this.context.project.getLocales();
         let content = await HashBrown.Entity.Resource.Content.get(this.context, contentId);
+
+        let locales = content.publishFor;
+
+        if(!locales || locales.length < 1) {
+            locales = await this.context.project.getLocales();
+        }
 
         for(let locale of locales) {
             let data = await this.processor.process(content, locale);
@@ -181,7 +186,7 @@ class Publication extends require('Common/Entity/Resource/Publication') {
         let locale = query.locale;
 
         if(!locale) {
-            let locales = await this.context.project.getLocales()
+            let locales = await this.context.project.getLocales();
 
             locale = locales[0] || 'en';
         }
@@ -191,12 +196,20 @@ class Publication extends require('Common/Entity/Resource/Publication') {
 
             if(cache) { return cache; }
         }
-        
+       
+        delete query.nocache;
+
         let items = await HashBrown.Entity.Resource.Content.list(this.context);
         let result = [];
 
         for(let item of items) {
-            if(!item.isPublished) { continue; }
+            if(
+                !item.isPublished ||
+                (
+                    item.publishFor.length > 0 &&
+                    item.publishFor.indexOf(locale) < 0
+                )
+            ) { continue; }
 
             if(this.allowedSchemas && this.allowedSchemas.length > 0 && this.allowedSchemas.indexOf(item.schemaId) < 0) { continue; }
             

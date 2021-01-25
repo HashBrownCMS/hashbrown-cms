@@ -35,7 +35,11 @@ class LocaleEditor extends HashBrown.Entity.View.Field.FieldBase {
     async fetch() {
         await super.fetch();
 
-        this.state.localeOptions = this.context.project.settings.locales;
+        this.state.localeOptions = {};
+
+        for(let locale of this.context.project.settings.locales) {
+            this.state.localeOptions[HashBrown.Service.LocaleService.getLocaleName(locale)] = locale; 
+        }
     }
 }
 

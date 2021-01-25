@@ -20,6 +20,11 @@
         margin-right: 0.5rem;
     }
 
+    &.embedded {
+        background-color: transparent;
+        border-color: transparent;
+    }
+
     &.small {
         flex-grow: 0;
         flex-shrink: 0;

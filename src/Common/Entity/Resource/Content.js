@@ -30,6 +30,7 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
         
         // Publishing
         this.def(Date, 'publishOn');
+        this.def(Array, 'publishFor', []);
         this.def(Date, 'unpublishOn');
         this.def(Boolean, 'isPublished');
 
@@ -49,6 +50,8 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
 
         // Ensure correct type for dates
         function parseDate(input) {
+            if(!input) { return null; }
+
             let result;
 
             if(typeof input === 'string' && !isNaN(input)) {
@@ -60,18 +63,10 @@ class Content extends HashBrown.Entity.Resource.ResourceBase {
             return result;
         }
 
-        if(params.createDate) {
-            params.createdOn = params.createDate;
-            delete params.createDate;
-        }
-        
-        if(params.updateDate) {
-            params.updatedOn = params.updatedDate;
-            delete params.updateDate;
-        }
-
         params.createdOn = parseDate(params.createdOn);
         params.updatedOn = parseDate(params.updatedOn);
+        params.publishOn = parseDate(params.publishOn);
+        params.unpublishOn = parseDate(params.unpublishOn);
 
         super.adopt(params);
     }
