@@ -87,7 +87,7 @@ class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorB
             if(this.context.project.settings.locales.length > 1) {
                 contentFields.publishIn = this.model.publishIn.length > 0 ? this.model.publishIn : this.context.project.settings.locales;
                 
-                schemaFields.publishOn = {
+                schemaFields.publishIn = {
                     label: 'Publish in',
                     schemaId: 'locale',
                     tabId: 'locales',
