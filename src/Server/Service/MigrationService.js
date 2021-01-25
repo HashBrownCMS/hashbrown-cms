@@ -12,8 +12,6 @@ class MigrationService {
     static async migrate() {
         let availableMigrations = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'migrations'));
 
-        debug.log('Checking for migrations...', this);
-
         for(let filePath of availableMigrations) {
             let filename = Path.basename(filePath);
 
@@ -29,12 +27,11 @@ class MigrationService {
             let completedMigration = await HashBrown.Service.DatabaseService.findOne('system', 'migrations', { version: version });
 
             if(completedMigration) {
-                debug.log(`* ${version} ✔`, this);
                 continue;
             }
             
             // Start migration
-            debug.log(`* Migrating ${version}...`, this);
+            debug.log(`Migrating database to version ${version}...`, this);
             
             let migration = require(filePath);
 

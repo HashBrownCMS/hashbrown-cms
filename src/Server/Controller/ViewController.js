@@ -30,14 +30,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
                 handler: this.readme,
                 user: true
             },
-            '/testing': {
-                redirect: '/testing/frontend',
-                user: true
-            },
-            '/testing/${tab}': {
-                handler: this.testing,
-                user: true
-            },
             '/demo': {
                 handler: this.demo
             },
@@ -230,16 +222,6 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             uptime: uptime,
             themes: themes,
             plugins: plugins
-        });
-    }
-
-    /**
-     * Testing
-     */
-    static async testing(request, params, body, query, context) {
-        return this.render('testing', {
-            context: context,
-            tab: params.tab
         });
     }
 

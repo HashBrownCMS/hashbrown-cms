@@ -103,7 +103,7 @@ async function main() {
     for(let signal of [ 'SIGINT', 'SIGTERM', 'SIGUSR1', 'SIGUSR2', 'exit' ]) {
         process.on(signal, (e) => {
             if(e instanceof Error) {
-                debug.error(e, 'HashBrown', true);
+                debug.error(e, 'HashBrown');
             }
 
             HashBrown.Service.EventService.trigger('stop');

@@ -7,14 +7,18 @@
     "scripts": {
         "build:frontend": "webpack --progress",
         "watch:frontend": "webpack --watch --progress",
+        
         "start": "npm run build:frontend && node hashbrown.js",
+        "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend",
+        
         "watch:nodemon": "nodemon hashbrown.js",
+        
+        "db:docker": "cd ./docker && sudo docker-compose exec mongodb mongo",
+        "restart:docker": "cd ./docker && sudo docker-compose restart",
         "start:docker": "npm run build:frontend && cd ./docker && sudo docker-compose up --build -d",
         "stop:docker": "cd ./docker && sudo docker-compose down",
-        "restart:docker": "cd ./docker && sudo docker-compose restart",
-        "watch:docker": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && sudo docker-compose logs -f node",
-        "db:docker": "cd ./docker && sudo docker-compose exec mongodb mongo",
-        "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend"
+        "test:docker": "cd ./docker && sudo docker-compose exec node node /opt/hashbrown-cms/hashbrown.js test",
+        "watch:docker": "cd ./docker && sudo docker-compose -f docker-compose.yml -f docker-compose.watch.yml up --build -d && sudo docker-compose logs -f node"
     },
     "author": "Jeppe Zapp",
     "license": "MIT",

@@ -39,7 +39,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
             let response = await this.handle(request);
 
             // Check for cache matches
-            if(this.isCached(request, response)) {
+            if(response && this.isCached(request, response)) {
                 return new HashBrown.Http.Response('Not modified', 304);
             }
 

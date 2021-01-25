@@ -167,7 +167,7 @@ class DebugService {
             error = new Error(error);
         }
 
-        this.onLog(sender, error.message || error.trace);
+        this.onLog(sender, error.message || error.stack);
    
         if(error.stack) {
             console.log(error.stack);
