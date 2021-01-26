@@ -7,9 +7,11 @@ const Path = require('path');
  */
 class MigrationService {
     /**
-     * Run all necessary migrations
+     * Runs all necessary migrations
+     * 
+     * @param {Boolean} skipCompleted
      */
-    static async migrate() {
+    static async migrate(skipCompleted = true) {
         let availableMigrations = await HashBrown.Service.FileService.list(Path.join(APP_ROOT, 'migrations'));
 
         for(let filePath of availableMigrations) {
@@ -24,10 +26,10 @@ class MigrationService {
             if(version.split('.').length !== 3) { continue; }
 
             // Check if this migration has already been completed
-            let completedMigration = await HashBrown.Service.DatabaseService.findOne('system', 'migrations', { version: version });
+            if(skipCompleted) {
+                let completedMigration = await HashBrown.Service.DatabaseService.findOne('system', 'migrations', { version: version });
 
-            if(completedMigration) {
-                continue;
+                if(completedMigration) { continue; }
             }
             
             // Start migration
@@ -43,7 +45,7 @@ class MigrationService {
                 time: Date.now()
             });
 
-            debug.log(`* Done!`, this);
+            debug.log(`Done!`, this);
         }
     }
 }

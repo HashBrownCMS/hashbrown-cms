@@ -8,14 +8,14 @@ async function migrate() {
 
     // Migrate users
     if(databases.indexOf('users') > -1) {
-        debug.log('  * Migrating users...', HashBrown.Service.MigrationService);
+        debug.log('Migrating users...', HashBrown.Service.MigrationService);
         
         await HashBrown.Service.DatabaseService.dump('users');
 
         let users = await HashBrown.Service.DatabaseService.find('users', 'users');
 
         for(let user of users) {
-            debug.log(`    * ${user.id}`, HashBrown.Service.MigrationService);
+            debug.log(`${user.id}`, HashBrown.Service.MigrationService);
             
             await HashBrown.Service.DatabaseService.updateOne('system', 'users', { id: user.id }, user, { upsert: true });
         }
@@ -27,14 +27,14 @@ async function migrate() {
 
     // Migrate schedule
     if(databases.indexOf('schedule') > -1) {
-        debug.log('  * Migrating schedule...', HashBrown.Service.MigrationService);
+        debug.log('Migrating schedule...', HashBrown.Service.MigrationService);
         
         await HashBrown.Service.DatabaseService.dump('schedule');
 
         let tasks = await HashBrown.Service.DatabaseService.find('schedule', 'tasks');
 
         for(let task of tasks) {
-            debug.log(`    * ${task.id}`, HashBrown.Service.MigrationService);
+            debug.log(`${task.id}`, HashBrown.Service.MigrationService);
             
             await HashBrown.Service.DatabaseService.updateOne('system', 'tasks', { id: task.id }, task, { upsert: true });
         }
@@ -46,25 +46,25 @@ async function migrate() {
 
     // Check each project
     for(let projectId of databases) {
-        debug.log(`  * Migrating project ${projectId}...`, HashBrown.Service.MigrationService);
+        debug.log(`Migrating project ${projectId}...`, HashBrown.Service.MigrationService);
 
-        debug.log('    * Creating backup...', HashBrown.Service.MigrationService);
+        debug.log('Creating backup...', HashBrown.Service.MigrationService);
 
         await HashBrown.Service.DatabaseService.dump(projectId);
 
-        debug.log('    * Migrating settings...', HashBrown.Service.MigrationService);
+        debug.log('Migrating settings...', HashBrown.Service.MigrationService);
         
         await migrateSettings(projectId);
         
-        debug.log('    * Migrating publications...', HashBrown.Service.MigrationService);
+        debug.log('Migrating publications...', HashBrown.Service.MigrationService);
         
         await migratePublications(projectId);
         
-        debug.log('    * Migrating content...', HashBrown.Service.MigrationService);
+        debug.log('Migrating content...', HashBrown.Service.MigrationService);
         
         await migrateContent(projectId);
         
-        debug.log('    * Migrating schemas...', HashBrown.Service.MigrationService);
+        debug.log('Migrating schemas...', HashBrown.Service.MigrationService);
         
         await migrateSchemas(projectId);
     }
