@@ -48,9 +48,15 @@ class User extends require('Common/Entity/User') {
             1000; // Milliseconds
 
         let expires = persist ? false : Date.now() + validDuration;
+        let salt = Crypto.randomBytes(128).toString('hex');
+        let hash = Crypto.createHmac('sha512', salt);
+
+        hash.update(key);
+        hash = hash.digest('hex');
         
         let token = {
-            key: key,
+            hash: hash,
+            salt: salt,
             expires: expires
         };
 
@@ -73,7 +79,13 @@ class User extends require('Common/Entity/User') {
             let existingToken = this.tokens[i];
             let isExpired = existingToken.expires !== false && existingToken.expires < Date.now();
 
-            if(isExpired || existingToken.key !== token) { continue; }
+            if(!existingToken.hash || !existingToken.salt) { continue; }
+
+            let hash = Crypto.createHmac('sha512', existingToken.salt);
+            hash.update(token);
+            hash = hash.digest('hex');
+
+            if(isExpired || existingToken.hash !== hash) { continue; }
 
             return true;
         }
@@ -89,7 +101,7 @@ class User extends require('Common/Entity/User') {
             let existingToken = this.tokens[i];
             let isExpired = existingToken.expires != false && existingToken.expires < Date.now();
             
-            if(isExpired) {
+            if(isExpired || !existingToken.hash || !existingToken.salt) {
                 this.tokens.splice(i, 1);
             }
         }
