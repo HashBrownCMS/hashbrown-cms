@@ -12,7 +12,15 @@ class MigrateEnvironments extends HashBrown.Entity.View.Modal.ModalBase {
     constructor(params) {
         super(params);
 
-        this.updateToOptions();
+        this.state.toOptions = [];
+
+        for(let environment of this.model.environments) {
+            if(environment === this.state.from) { continue; }
+
+            this.state.toOptions.push(environment);
+        }
+
+        this.state.to = this.state.toOptions[0];
         
         this.template = require('template/modal/migrateEnvironments');
     }
@@ -40,19 +48,6 @@ class MigrateEnvironments extends HashBrown.Entity.View.Modal.ModalBase {
         } catch(e) {
             this.setErrorState(e);
 
-        }
-    }
-
-    /**
-     * Updates the "to" options
-     */
-    updateToOptions() {
-        this.state.toOptions = [];
-
-        for(let environment of this.model.environments) {
-            if(environment === this.state.from) { continue; }
-
-            this.state.toOptions.push(environment);
         }
     }
 

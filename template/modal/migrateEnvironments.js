@@ -14,7 +14,7 @@ _.div({class: 'modal in'},
             
             ] : [
                 _.field({localized: true, separator: false, label: 'Destination', description: 'Migrate all resources to this environment'},
-                    _.popup({options: state.toOptions, onchange: _.onChangeTo})
+                    _.popup({value: state.to, options: state.toOptions, onchange: _.onChangeTo})
                 )
 
             ]
