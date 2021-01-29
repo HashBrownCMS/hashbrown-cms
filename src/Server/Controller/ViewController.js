@@ -157,6 +157,44 @@ class ViewController extends HashBrown.Controller.ControllerBase {
         let markdown = await HashBrown.Service.FileService.read(Path.join(APP_ROOT, 'README.md'));
         let html = HashBrown.Service.MarkdownService.toHtml(markdown.toString('utf8'));
 
+        html = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>HashBrown</title>
+
+                    <meta charset="utf-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width initial-scale=1">
+                    <meta name="description" content="A free and open-source headless CMS">
+                    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+
+                    <link href="/cms/svg/favicon.svg" rel="icon" type="image/svg">
+
+                    <style>
+                        img {
+                            width: 100%;
+                        }
+                        
+                        body {
+                            margin: 3rem auto;
+                            max-width: 60rem;
+                            line-height: 1.5;
+                            color: #444;
+                            padding: 0 1rem;
+                        }
+                        
+                        h1, h2, h3 {
+                            line-height: 1.2;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                </body>
+            </html>
+        `;
+
         return new HashBrown.Http.Response(html, 200, { 'Content-Type': 'text/html' });
     }
     

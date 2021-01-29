@@ -54,25 +54,25 @@
             position: absolute;
             top: 0;
             left: 50%;
-            display: flex;
             padding: var(--padding-medium);
             transform: translateX(-50%);
-            align-items: center;
+            width: 16rem;
+            padding-left: 4rem;
+            text-align: left;
 
             svg {
                 display: block;
-                fill: var(--color-decor-700);
+                fill: var(--color-action-500);
                 width: var(--size-widget-medium);
                 height: var(--size-widget-medium);
+                position: absolute;
+                top: 50%;
+                left: 0;
+                transform: translateY(-50%);
             }
-
-            &:hover svg {
-                fill: var(--color-action-500);
-            }
-
+            
             h1 {
                 color: var(--color-default);
-                margin-left: var(--padding-medium);
                 white-space: nowrap;
             }
         }
