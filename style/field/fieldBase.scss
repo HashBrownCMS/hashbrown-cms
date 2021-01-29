@@ -29,6 +29,8 @@
         height: 100%;
         background-color: var(--color-default-100);
         padding: var(--padding-large);
+        display: flex;
+        flex-direction: column;
     }
 
     &__tools {
@@ -84,7 +86,7 @@
     }
     
     &.fullscreen &__content {
-        height: 100%;
+        flex-grow: 1;
     }
 
     &__value {
