@@ -20,6 +20,8 @@ class SchemaController extends HashBrown.Controller.ResourceController {
     }
 
     /**
+     * Gets all schema icons in a map
+     *
      * @example GET /api/${project}/${environment}/schemas/icons
      */
     static async icons(request, params, body, query, context) {
@@ -34,9 +36,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example POST /api/${project}/${environment}/schemas/{$id}/pull
-     *
-     * @return {Object} The pulled resource
+     * @inheritdoc
      */
     static async pull(request, params, body, query, context) {
         // Clear publication cache
@@ -50,7 +50,7 @@ class SchemaController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example GET|POST|DELETE /api/${project}/${environment}/schemas/${id}?create=true|false
+     * @inheritdoc
      */
     static async resource(request, params, body, query, context) {
         // Clear publication cache

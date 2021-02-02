@@ -19,6 +19,8 @@ class DeployerController extends HashBrown.Controller.ControllerBase {
     }        
     
     /**
+     * Lists all deployers
+     *
      * @example GET /api/deployers
      */
     static async deployers(request, params, body, query, context) {

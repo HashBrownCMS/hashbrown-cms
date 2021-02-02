@@ -21,6 +21,8 @@ class PublicationController extends HashBrown.Controller.ResourceController {
     }        
     
     /**
+     * Queries this publication for content
+     *
      * @example GET /api/${project}/${environment}/publications/${id}/query[?key=value]
      */
     static async query(request, params, body, query, context) {

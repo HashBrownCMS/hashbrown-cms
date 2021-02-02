@@ -23,6 +23,8 @@ class MediaController extends HashBrown.Controller.ResourceController {
     }        
     
     /**
+     * Renames a folder
+     *
      * @example POST /api/${project}/environment/media/renameFolder?from=XXX&to=XXX { from: XXX, to: XXX }
      */
     static async renameFolder(request, params, body, query, context) {
@@ -58,9 +60,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
     }
 
     /**
-     * @example GET /api/${project}/${environment}/media/${id}
-     * @example POST /api/${project}/${environment}/media/${id}?create=true|false { folder: XXX, filename: XXX, full: XXX, thumbnail: XXX }
-     * @example DELETE /api/${project}/${environment}/media/${id}
+     * @inheritdoc
      */
     static async resource(request, params, body, query, context) {
         if(request.method !== 'POST') {
@@ -92,7 +92,7 @@ class MediaController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example POST /api/${project}/${environment}/media/new { folder: XXX, filename: XXX, full: XXX }
+     * @inheritdoc
      */
     static async new(request, params, body, query, context) {
         let options = {
@@ -104,11 +104,6 @@ class MediaController extends HashBrown.Controller.ResourceController {
 
         return new HashBrown.Http.Response(media);
     }
-
-    /**
-     * @example GET /api/${project}/${environment}/media/settings
-     */
-
 }
 
 module.exports = MediaController;

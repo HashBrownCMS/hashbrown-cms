@@ -19,6 +19,8 @@ class ProcessorController extends HashBrown.Controller.ControllerBase {
     }        
     
     /**
+     * Lists all processors
+     *
      * @example GET /api/processors
      */
     static async processors(request, params, body, query, context) {

@@ -97,7 +97,7 @@ i
     }
 
     /**
-     * @example POST /api/${project}/${environment}/${library}/${id}/heartbeat
+     * Updates the resource with information about who is viewing it
      */
     static async heartbeat(request, params, body, query, context) {
         let model = HashBrown.Service.LibraryService.getClass(this.library, HashBrown.Entity.Resource.ResourceBase);
@@ -118,6 +118,8 @@ i
     }
    
     /**
+     * Pulls a resource from a synced instance
+     *
      * @example POST /api/${project}/${environment}/${library}/{$id}/pull
      *
      * @return {Object} The pulled resource
@@ -141,6 +143,8 @@ i
     }
     
     /**
+     * Pushes a resource to a synced instance
+     *
      * @example POST /api/${project}/${environment}/{library}/${id}/push
      */
     static async push(request, params, body, query, context) {
@@ -162,6 +166,8 @@ i
     }
     
     /**
+     * Lists all resources
+     *
      * @example GET /api/${project}/${environment}/${library}
      */
     static async resources(request, params, body, query, context) {
@@ -177,6 +183,8 @@ i
     }
     
     /**
+     * Modifies a single resource
+     *
      * @example GET|POST|DELETE /api/${project}/${environment}/${library}/${id}?create=true|false
      */
     static async resource(request, params, body, query, context) {
@@ -228,6 +236,8 @@ i
     }
     
     /**
+     * Creates a new resource
+     *
      * @example POST /api/${project}/${environment}/${library}/new
      */
     static async new(request, params, body, query, context) {

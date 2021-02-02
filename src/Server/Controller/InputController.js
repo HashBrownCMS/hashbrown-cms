@@ -64,6 +64,8 @@ class InputController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Creates a user account
+     *
      * @example create-user u=XXX p=XXX admin=true|false
      */
     static async createUser(args) {
@@ -75,6 +77,8 @@ class InputController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Makes an existing user an admin
+     *
      * @example make-user-admin u=XXX
      */
     static async makeUserAdmin(args) {
@@ -94,6 +98,8 @@ class InputController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Revokes all session tokens from a user
+     *
      * @example revoke-tokens u=XXX
      */
     static async revokeTokens(args) {
@@ -113,6 +119,8 @@ class InputController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Changes the scopes for a user
+     *
      * @example set-user-scopes u=XXX p=XXX s=XXX,XXX,XXX
      */
     static async setUserScopes(args) {
@@ -136,6 +144,8 @@ class InputController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Sets the password for a user
+     *
      * @example set-user-password u=XXX p=XXX
      */
     static async setUserPassword(args) {
@@ -155,6 +165,8 @@ class InputController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Runs unit tests
+     *
      * @example test u=XXX p=XXX
      */
     static async test(args) {

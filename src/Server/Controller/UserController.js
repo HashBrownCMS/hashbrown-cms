@@ -58,6 +58,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }    
     
     /**
+     * Logs in a user
+     *
      * @example POST /api/user/login?username=XXX&password=XXX&persist=true|false { username: XXX, password: XXX, persist: true|false }
      *
      * @return {String} Session token
@@ -73,6 +75,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /** 
+     * Logs out a user
+     *
      * @example POST /api/user/logout
      */
     static async logout(request, params, body, query, context) {
@@ -84,6 +88,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Get the current user
+     *
      * @example GET /api/user
      */
     static async current(request, params, body, query, context) {
@@ -94,6 +100,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Gets the scopes of the current user
+     *
      * @example GET /api/user/scopes
      */
     static async scopes(request, params, body, query, context) {
@@ -101,6 +109,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Lists all users
+     *
      * @example GET /api/users
      */
     static async users(request, params, body, query, context) {
@@ -110,6 +120,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Modifies a user
+     *
      * @example GET|POST|DELETE /api/users/${id}
      */
     static async user(request, params, body, query, context) {
@@ -180,6 +192,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Creates the first user
+     *
      * @example POST /api/users/first?username=XXX&password=XXX { username: XXX, password: XXX }
      */
     static async first(request, params, body, query) {
@@ -199,6 +213,8 @@ class UserController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Creates a new user
+     *
      * @example /api/users/new { username: XXX, password: XXX }
      */
     static async new(request, params, body, query, context) {

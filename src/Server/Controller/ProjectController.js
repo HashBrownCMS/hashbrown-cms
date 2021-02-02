@@ -132,6 +132,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Modifies a project
+     *
      * @example GET|POST /api/projects/${project}
      */
     static async project(request, params, body, query, context) {
@@ -166,6 +168,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Lists all project ids
+     *
      * @example GET /api/projects/ids
      */
     static async projectIds(request, params, body, query, context) {
@@ -183,6 +187,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Lists all projects
+     *
      * @example GET /api/projects
      */
     static async projects(request, params, body, query, context) {
@@ -200,6 +206,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Creates a new project
+     *
      * @example POST /api/projects/new?name=XXX&id=XXX { name: XXX, id: XXX }
      */
     static async new(request, params, body, query, context) {
@@ -213,6 +221,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
    
     /**
+     * Gets a new sync token
+     *
      * @example POST /api/projects/${project}/sync/token?username=XXX&password=XXX&url=XXX { username: XXX, password: XXX, url: XXX }
      */
     static async syncToken(request, params, body, query, context) {
@@ -226,6 +236,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Modifies the settings of a project
+     *
      * @example GET|POST /api/projects/${project}/settings[/${section}] { ... }
      */
     static async settings(request, params, body, query, context) {
@@ -247,6 +259,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
    
     /**
+     * Lists all environments of a project
+     *
      * @example GET /api/projects/${project}/environments
      */
     static async environments(request, params, body, query, context) {
@@ -260,6 +274,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Migrates resources between environments
+     *
      * @example POST /api/projects/${project}/migrate?from=XXX&to=XXX { from: XXX, to: XXX }
      */
     static async migrateEnvironment(request, params, body, query, context) {
@@ -269,6 +285,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
 
     /**
+     * Creates a new environment
+     *
      * @example POST /api/projects/${project}/environments/new?name=XXX&from=XXX { name: XXX, from: XXX }
      */
     static async newEnvironment(request, params, body, query, context) {
@@ -284,6 +302,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Modifies an environment
+     *
      * @example GET|POST|DELETE /api/projects/${project}/environments/${environment}
      */
     static async environment(request, params, body, query, context) {
@@ -328,6 +348,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
     
     /**
+     * Restores a backup
+     *
      * @example POST /api/projects/{project}/backups/${timestamp}/restore
      */
     static async restoreBackup(request, params, body, query, context) {
@@ -337,6 +359,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
   
     /**
+     * Creates a new backup
+     *
      * @example POST /api/projects/{project}/backups/new
      */
     static async newBackup(request, params, body, query, context) {
@@ -347,6 +371,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
 
 
     /**
+     * Modifies a backup
+     *
      * @example GET|DELETE /api/projects/{project}/backups/${timestamp}
      */
     static async backup(request, params, body, query, context) {
@@ -371,6 +397,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     }
     
     /**
+     * Uploads a new backup
+     *
      * @example POST /api/projects/{project}/backups/upload
      */
     static async uploadBackup(request, params, body, query, context) {
@@ -401,6 +429,8 @@ class ProjectController extends HashBrown.Controller.ControllerBase {
     } 
 
     /**
+     * Lists all users for a project
+     *
      * @example GET /api/projects/{project}/users
      */
     static async users(request, params, body, query, context) {

@@ -30,6 +30,8 @@ class ContentController extends HashBrown.Controller.ResourceController {
     }
     
     /**
+     * Republishes all content
+     *
      * @example POST /api/${project}/${environment}/content/republish
      */
     static async republish(request, params, body, query, context) {
@@ -53,9 +55,7 @@ class ContentController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example POST /api/${project}/${environment}/content/{$id}/pull
-     *
-     * @return {Object} The pulled resource
+     * @inheritdoc
      */
     static async pull(request, params, body, query, context) {
         // Clear publication cache
@@ -69,7 +69,7 @@ class ContentController extends HashBrown.Controller.ResourceController {
     }
     
     /**
-     * @example GET|POST|DELETE /api/${project}/${environment}/content/${id}?create=true|false
+     * @inheritdoc
      */
     static async resource(request, params, body, query, context) {
         // Clear publication cache
@@ -85,6 +85,8 @@ class ContentController extends HashBrown.Controller.ResourceController {
     }
     
     /**
+     * Inserts a content resource at a specified sort order
+     *
      * @example POST /api/${project}/${environment}/content/${id}/insert?parentId=XXX&position=XXX
      */
     static async insert(request, params, body, query, context) {
