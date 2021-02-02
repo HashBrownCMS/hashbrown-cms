@@ -5,7 +5,7 @@ const Path = require('path');
 /**
  * FileSystem deployer
  *
- * @memberof HashBrown.Server.Entity
+ * @memberof HashBrown.Server.Entity.Deployer
  */
 class FileSystemDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     /**

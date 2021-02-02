@@ -5,7 +5,7 @@ const Path = require('path');
 /**
  * A class for deploying and retrieving data to and from a server
  *
- * @memberof HashBrown.Server.Entity
+ * @memberof HashBrown.Server.Entity.Deployer
  */
 class DeployerBase extends HashBrown.Entity.EntityBase {
     static get alias() {

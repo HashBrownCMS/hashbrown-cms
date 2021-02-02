@@ -6,7 +6,7 @@ const Url = require('url');
 /**
  * Git deployer
  *
- * @memberof HashBrown.Server.Entity
+ * @memberof HashBrown.Server.Entity.Deployer
  */
 class GitDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     /**

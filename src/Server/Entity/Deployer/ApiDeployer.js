@@ -3,7 +3,7 @@
 /**
  * API deployer
  *
- * @memberof HashBrown.Server.Entity
+ * @memberof HashBrown.Server.Entity.Deployer
  */
 class ApiDeployer extends HashBrown.Entity.Deployer.DeployerBase {
     /**
