@@ -3,7 +3,7 @@
 /**
  * A modal for uploading Media objects
  *
- * @memberof HashBrown.Client.Entity.Client.View.Modal
+ * @memberof HashBrown.Client.Entity.View.Modal
  */
 class UploadMedia extends HashBrown.Entity.View.Modal.ModalBase {
     /**

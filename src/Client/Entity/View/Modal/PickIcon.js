@@ -3,7 +3,7 @@
 /**
  * A modal for picking icons
  *
- * @memberof HashBrown.Client.View.Modal
+ * @memberof HashBrown.Client.Entity.View.Modal
  */
 class PickIcon extends HashBrown.Entity.View.Modal.ModalBase {
     /**
