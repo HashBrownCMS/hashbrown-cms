@@ -2,6 +2,8 @@
 
 /**
  * The editor for schema resources
+ *
+ * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class SchemaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     /**

@@ -5,7 +5,7 @@ const Path = require('path');
 /**
  * The project class
  *
- * @memebrof HashBrown.Entity
+ * @memberof HashBrown.Entity
  */
 class Project extends require('Common/Entity/Project') {
     /**

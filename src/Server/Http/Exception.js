@@ -2,6 +2,8 @@
 
 /**
  * A throwable HTTP exception
+ *
+ * @memberof HashBrown.Server.Http
  */
 class Exception extends Error {
     constructor(message, code, headers) {

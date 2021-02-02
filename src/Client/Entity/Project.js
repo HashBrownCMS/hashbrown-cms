@@ -2,6 +2,8 @@
 
 /**
  * The project entity
+ *
+ * @memberof HashBrown.Client.Entity
  */
 class Project extends require('Common/Entity/Project') {
     /**

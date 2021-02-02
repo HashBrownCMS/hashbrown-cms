@@ -3,7 +3,7 @@
 /**
  * A list of comma-separated strings
  *
- * @memberof {HashBrown.Client.Entity.View.Field}
+ * @memberof HashBrown.Client.Entity.View.Field
  */
 class TagsEditor extends HashBrown.Entity.View.Field.FieldBase {
     /**

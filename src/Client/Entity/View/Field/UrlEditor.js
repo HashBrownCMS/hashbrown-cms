@@ -3,7 +3,7 @@
 /**
  * A editor of URLs with auto generate functionality
  *
- * @memberof {HashBrown.Client.Entity.View.Field}
+ * @memberof HashBrown.Client.Entity.View.Field
  */
 class UrlEditor extends HashBrown.Entity.View.Field.FieldBase {
     /**

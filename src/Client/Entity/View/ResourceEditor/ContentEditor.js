@@ -2,6 +2,8 @@
 
 /**
  * The editor for content resources
+ *
+ * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class ContentEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     /**

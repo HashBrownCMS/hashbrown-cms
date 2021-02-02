@@ -2,6 +2,8 @@
 
 /**
  * The controller for resources
+ *
+ * @memberof HashBrown.Client.Controller
  */
 class ResourceController extends HashBrown.Controller.ControllerBase {
     /**

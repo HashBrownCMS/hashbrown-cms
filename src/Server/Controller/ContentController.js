@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Controller for Content
+ * Controller for content
  *
  * @memberof HashBrown.Server.Controller
  */

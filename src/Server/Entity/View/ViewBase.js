@@ -2,6 +2,8 @@
 
 /**
  * The base view for server side pages
+ *
+ * @memberof HashBrown.Server.Entity.View
  */
 class ViewBase extends require('Common/Entity/View/ViewBase') {
     /**

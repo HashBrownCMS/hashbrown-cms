@@ -2,6 +2,8 @@
 
 /**
  * The editor for media resources
+ *
+ * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     /**

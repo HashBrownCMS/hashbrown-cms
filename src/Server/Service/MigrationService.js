@@ -4,6 +4,8 @@ const Path = require('path');
 
 /**
  * The helper class for migrating older structures to new ones
+ *
+ * @memberof HashBrown.Server.Service
  */
 class MigrationService {
     /**

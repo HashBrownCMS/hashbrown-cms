@@ -7,6 +7,8 @@ const CodeMirror = {
 
 /**
  * The advanced resource editor
+ *
+ * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class JsonEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     static get itemType() { return null; }

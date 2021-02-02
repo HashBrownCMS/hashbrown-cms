@@ -2,6 +2,8 @@
 
 /**
  * The media class
+ *
+ * @memberof HashBrown.Client.Entity.Resource
  */
 class Media extends require('Common/Entity/Resource/Media') {
     static get useCaching() { return true; }

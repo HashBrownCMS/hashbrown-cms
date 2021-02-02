@@ -4,6 +4,8 @@ const HTTP = require('http');
 
 /**
  * A server request
+ *
+ * @memberof HashBrown.Server.Http
  */
 class Request extends HTTP.IncomingMessage {
     /**

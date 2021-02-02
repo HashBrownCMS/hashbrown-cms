@@ -2,6 +2,8 @@
 
 /**
  * The base class for resources
+ *
+ * @memberof HashBrown.Server.Entity.Resource
  */
 class ResourceBase extends require('Common/Entity/Resource/ResourceBase') {
     /**

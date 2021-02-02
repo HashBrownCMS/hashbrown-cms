@@ -2,6 +2,8 @@
 
 /**
  * The editor for publication resources
+ *
+ * @memberof HashBrown.Client.Entity.View.ResourceEditor
  */
 class PublicationEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBase {
     /**
