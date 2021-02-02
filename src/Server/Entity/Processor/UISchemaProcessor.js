@@ -3,7 +3,7 @@
 /**
  * uischema.org processor
  *
- * @memberof HashBrown.Server.Entity
+ * @memberof HashBrown.Server.Entity.Processor
  */
 class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
     /**

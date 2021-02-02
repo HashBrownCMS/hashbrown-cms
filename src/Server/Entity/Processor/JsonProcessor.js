@@ -3,7 +3,7 @@
 /**
  * JSON processor
  *
- * @memberof HashBrown.Server.Entity
+ * @memberof HashBrown.Server.Entity.Processor
  */
 class JsonProcessor extends HashBrown.Entity.Processor.ProcessorBase {
     /**

@@ -3,7 +3,7 @@
 /**
  * A class for processing Content before it is deployed
  *
- * @memberof HashBrown.Common.Entity
+ * @memberof HashBrown.Common.Entity.Processor
  */
 class ProcessorBase extends HashBrown.Entity.EntityBase {
     static get alias() {
