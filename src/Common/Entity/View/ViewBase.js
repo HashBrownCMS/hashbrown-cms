@@ -2,6 +2,8 @@
 
 /**
  * The base view class
+ *
+ * @memberof HashBrown.Common.Entity.View
  */
 class ViewBase extends HashBrown.Entity.EntityBase {
     /**
