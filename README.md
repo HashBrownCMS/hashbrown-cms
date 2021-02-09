@@ -34,7 +34,7 @@ First make sure you have these dependencies met:
 
 Then clone the code and install the dependencies:  
 ```
-git clone https://github.com/HashBrownCMS/hashbrown-cms.git --recursive
+git clone https://github.com/HashBrownCMS/hashbrown-cms.git
 cd ./hashbrown-cms
 npm install
 ```
@@ -78,7 +78,6 @@ Or manually:
 ```
 cd /to/your/hashbrown/dir
 git pull
-git submodule update --recursive --init
 npm install
 webpack 
 ```
