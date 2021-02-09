@@ -3,7 +3,7 @@
 /**
  * The base class for all Schema types
  *
- * @memberof HashBrown.Common.Entity.Resource
+ * @memberof HashBrown.Common.Entity.Resource.Schema
  */
 class SchemaBase extends HashBrown.Entity.Resource.ResourceBase {
     set icon(name) { this.customIcon = name; }

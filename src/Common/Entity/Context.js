@@ -2,6 +2,8 @@
 
 /**
  * A class for holding information about the current context
+ *
+ * @memberof HashBrown.Common.Entity
  */
 class Context extends HashBrown.Entity.EntityBase {
     /**

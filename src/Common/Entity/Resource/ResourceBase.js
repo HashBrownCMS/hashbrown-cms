@@ -3,7 +3,7 @@
 /**
  * Basic resource class
  *
- * @memberof HashBrown.Common.Entity
+ * @memberof HashBrown.Common.Entity.Resource
  */
 class ResourceBase extends HashBrown.Entity.EntityBase {
     /**
