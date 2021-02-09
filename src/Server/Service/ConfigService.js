@@ -91,7 +91,7 @@ class ConfigService {
                 all[configName] = await this.get(configName);
             }
 
-            if(!all.system) { all.system = {}; }
+            if(!all.system) { all.system = { rootUrl: '' }; }
             if(!all.database) { all.database = {}; }
 
             return all;

@@ -7,12 +7,9 @@
     "scripts": {
         "build:frontend": "webpack --progress",
         "watch:frontend": "webpack --watch --progress",
-        
         "start": "npm run build:frontend && node hashbrown.js",
         "update": "git pull && git submodule update --recursive --init && npm install && npm run build:frontend",
-        
         "watch:nodemon": "nodemon hashbrown.js",
-        
         "db:docker": "cd ./docker && sudo docker-compose exec mongodb mongo",
         "restart:docker": "cd ./docker && sudo docker-compose restart",
         "start:docker": "npm run build:frontend && cd ./docker && sudo docker-compose up --build -d",

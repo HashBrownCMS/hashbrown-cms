@@ -173,7 +173,7 @@ class ControllerBase extends require('Common/Controller/ControllerBase') {
     static error(error, context) {
         checkParam(error, 'error', Error, true);
         
-        debug.error(error, this, true);
+        debug.error(error, this);
 
         return new HashBrown.Http.Response(error.message || 'Unexpected error', error.code || 500, error.headers || {});
     }

@@ -91,6 +91,8 @@ class ViewController extends HashBrown.Controller.ControllerBase {
             error.code = 500;
         }
 
+        debug.error(error, this);
+
         switch(error.code) {
             default:
                 return this.render('error', { message: error.message, context: context }, error.code);
