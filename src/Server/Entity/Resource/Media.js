@@ -221,6 +221,12 @@ class Media extends require('Common/Entity/Resource/Media') {
                     context: context
                 });
             }
+
+            let stats = await HashBrown.Service.FileService.stat(file);
+
+            resource.filename = filename;
+            resource.updatedOn = stats.ctime;
+            break;
         }
 
         return resource;
