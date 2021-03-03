@@ -55,9 +55,6 @@ class DatabaseService {
             case 'host':
                 return 'localhost';
 
-            case 'port':
-                return '27017';
-
             case 'prefix':
                 return 'hb_';
 
@@ -98,8 +95,12 @@ class DatabaseService {
 
         hosts.forEach((host, index) => {
             let port = ports[index] || ports[0];
-        
-            connectionString += `${host}:${port}`;
+       
+            if(port) {
+                connectionString += `${host}:${port}`;
+            } else {
+                connectionString += `${host}`;
+            }
             
             if(index !== hosts.length - 1) {
                 connectionString += ',';
