@@ -7,7 +7,7 @@ How to configure HashBrown for your needs
 ```
 {
   "rootUrl": "/cms"     // Hosting HashBrown on a subpath
-  "projects": [         // Definiting standard projects 
+  "projects": [         // Defining standard projects 
     {
       "id": "<project id>",
       "name" "<project name">,
@@ -22,6 +22,7 @@ How to configure HashBrown for your needs
 
 ## Database  
 ### Using environment variables:
+  - `MONGODB_PROTOCOL`: protocol type
   - `MONGODB_HOST`: host(s), split by comma, default value is `localhost`
   - `MONGODB_PORT`: port(s), split by comma
   - `MONGODB_USERNAME`: username
