@@ -2,4 +2,4 @@
 
 module.exports = (_, model, state) =>
 
-_.popup({disabled: model.isDisabled, value: state.value, options: state.contentOptions, onchange: _.onChange})
+_.popup({disabled: model.isDisabled, clearable: true, value: state.value, options: state.contentOptions, onchange: _.onChange})

@@ -404,10 +404,19 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 };
 
             case 'CreativeWork':
+                let allowedSchemas = [];
+
+                for(let schemaId of definition['@options'] || []) {
+                    allowedSchemas.push(this.translateTypeFromUISchema(schemaId));
+                }
+                
                 return {
                     label: i18n['@name'] || key,
                     isLocalized: isLocalized,
-                    schemaId: 'contentReference'
+                    schemaId: 'contentReference',
+                    config: {
+                        allowedSchemas: allowedSchemas
+                    }
                 };
 
             case 'AudioObject':
