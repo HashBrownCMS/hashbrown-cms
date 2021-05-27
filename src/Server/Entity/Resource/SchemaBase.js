@@ -352,10 +352,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
 
         switch(definition['@type']) {
             case 'ItemList':
-                let allowedSchemas = [];
+                let allowedFieldSchemas = [];
 
                 for(let schemaId of definition['@options'] || []) {
-                    allowedSchemas.push(this.translateTypeFromUISchema(schemaId));
+                    allowedFieldSchemas.push(this.translateTypeFromUISchema(schemaId));
                 }
 
                 return {
@@ -363,7 +363,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     isLocalized: isLocalized,
                     schemaId: 'array',
                     config: {
-                        allowedSchemas: allowedSchemas,
+                        allowedSchemas: allowedFieldSchemas,
                         minItems: definition['@min'] || 0,
                         maxItems: definition['@max'] || 0
                     }
@@ -404,10 +404,10 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                 };
 
             case 'CreativeWork':
-                let allowedSchemas = [];
+                let allowedContentSchemas = [];
 
                 for(let schemaId of definition['@options'] || []) {
-                    allowedSchemas.push(this.translateTypeFromUISchema(schemaId));
+                    allowedContentSchemas.push(this.translateTypeFromUISchema(schemaId));
                 }
                 
                 return {
@@ -415,7 +415,7 @@ class SchemaBase extends require('Common/Entity/Resource/SchemaBase') {
                     isLocalized: isLocalized,
                     schemaId: 'contentReference',
                     config: {
-                        allowedSchemas: allowedSchemas
+                        allowedSchemas: allowedContentSchemas
                     }
                 };
 
