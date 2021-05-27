@@ -30,7 +30,11 @@ class FieldBase extends HashBrown.Entity.View.ViewBase {
         let config = definition.config || {};
 
         if(schema.parentId !== 'fieldBase') {
-            config = schema.config;
+            for(let key in schema.config) {
+                if(config[key] !== undefined) { continue; }
+                
+                config[key] = schema.config[key];
+            }
         }
 
         let model = {
