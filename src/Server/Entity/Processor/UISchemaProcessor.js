@@ -13,11 +13,11 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      * @param {String} schemaId
      * @param {Object} config
      * @param {String} locale
-     * @param {Array} excludeTypes
+     * @param {Number} nestingLevel
      *
      * @return {*} Value
      */
-    async check(value, schemaId, config, locale, excludeTypes) {
+    async check(value, schemaId, config, locale, nestingLevel = 0) {
         if(value === null || value === undefined || value === '') { return null; }
 
         if(!schemaId) { return value; }
@@ -26,13 +26,6 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
         let schema = await HashBrown.Entity.Resource.FieldSchema.get(this.context, schemaId, { withParentFields: true });
 
         if(!schema) { return value; }
-        
-        if(excludeTypes && excludeTypes.indexOf(schema.baseId) > -1) {
-            if(schema.baseId === 'array') { return []; }
-            if(schema.baseId === 'struct') { return {}; }
-
-            return null;
-        }
 
         // Ensure and merge schema config
         if(!config) { config = {}; }
@@ -117,12 +110,11 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 break;
 
             case 'contentReference':
-                if(typeof value !== 'string') { return null; }
+                if(typeof value !== 'string' || nestingLevel > 10) { return null; }
 
                 let content = await HashBrown.Entity.Resource.Content.get(this.context, value);
                
-                // NOTE: We're excluding arrays, structs and content references to prevent infinite recursion
-                content = await this.process(content, locale, ['array', 'struct', 'contentReference']);
+                content = await this.process(content, locale, nestingLevel + 1);
         
                 for(let key in content) {
                     parsed[key] = content[key];
@@ -139,14 +131,14 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
      *
      * @param {Content} content
      * @param {String} locale
-     * @param {Array} excludeTypes
+     * @param {Number} nestingLevel
      *
      * @returns {Promise} Result
      */
-    async process(content, locale = 'en', excludeTypes = []) {
+    async process(content, locale = 'en', nestingLevel = 0) {
         checkParam(content, 'content', HashBrown.Entity.Resource.Content, true);
         checkParam(locale, 'locale', String, true);
-        checkParam(excludeTypes, 'excludeTypes', Array, true);
+        checkParam(nestingLevel, 'nestingLevel', Number);
 
         let schema = await HashBrown.Entity.Resource.ContentSchema.get(this.context, content.schemaId, { withParentFields: true });
         let properties = await content.getLocalizedProperties(locale);
@@ -186,7 +178,7 @@ class UISchemaProcessor extends HashBrown.Entity.Processor.ProcessorBase {
                 schema.config[key].schemaId,
                 schema.config[key].config,
                 locale,
-                excludeTypes
+                nestingLevel
             );
         }
        
