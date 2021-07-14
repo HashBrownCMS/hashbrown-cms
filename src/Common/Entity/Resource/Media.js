@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * The base class for all Media objects
+ * The base class for all media resources
  *
  * @memberof HashBrown.Common.Entity.Resource
  */
@@ -11,10 +11,9 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
             return 'file-video-o';
         }
 
-        if(this.isImage()) {
+        if(this.isImage() || this.isSvg()) {
             return 'file-image-o';
         }
-
 
         if(this.isAudio()) {
             return 'file-audio-o';
