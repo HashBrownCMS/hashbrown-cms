@@ -42,6 +42,7 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
         super.structure();
 
         this.def(Boolean, 'isDirty', false);
+        this.def(Number, 'cachedScrollPosition', 0);
     }
 
     /**
@@ -153,35 +154,47 @@ class ResourceEditorBase extends HashBrown.Entity.View.ViewBase {
     }
  
     /**
-     * Override render to maintain scroll position
+     * Caches the scroll position
      */
-    render() {
-        // Cache scroll position
+    cacheScrollPosition() {
         let body = this.namedElements.body;
 
         if(body instanceof HashBrown.Entity.View.ViewBase) {
             body = body.element;
         }
         
-        let scrollTop = 0;
+        this.cachedScrollPosition = 0;
 
         if(body) {
-            scrollTop = body.scrollTop;
+            this.cachedScrollPosition = body.scrollTop;
         }
+    }
+
+    /**
+     * Restores the scroll position
+     */
+    async restoreScrollPosition() {
+        let body = this.namedElements.body;
+
+        if(body instanceof HashBrown.Entity.View.ViewBase) {
+            body = body.element;
+        }
+        
+        if(body) {
+            body.scrollTop = this.cachedScrollPosition;
+        }
+    }
+
+    /**
+     * Override render to maintain scroll position
+     */
+    render() {
+        this.cacheScrollPosition();
 
         super.render();
         
-        // Restore scroll position
-        requestAnimationFrame(() => {
-            body = this.namedElements.body;
-
-            if(body instanceof HashBrown.Entity.View.ViewBase) {
-                body = body.element;
-            }
-            
-            if(body) {
-                body.scrollTop = scrollTop;
-            }
+        requestAnimationFrame(async () => {
+            await this.restoreScrollPosition();
 
             if(this.element) {
                 this.element.classList.toggle('locked', this.model && this.model.isLocked);

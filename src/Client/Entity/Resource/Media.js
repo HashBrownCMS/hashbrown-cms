@@ -125,6 +125,30 @@ class Media extends require('Common/Entity/Resource/Media') {
         
         HashBrown.Service.EventService.trigger('resource', this.id);
     }
+
+    /**
+     * Waits for an image to load
+     *
+     * @param {String} url
+     * @param {Boolean} ignoreErrors
+     */
+    static waitForImage(url, ignoreErrors = false) {
+        if(!url) { return; }
+
+        return new Promise((resolve, reject) => {
+            let img = new Image();
+            
+            img.onload = resolve;
+
+            if(ignoreErrors) {
+                img.onerror = resolve;
+            } else {
+                img.onerror = reject;
+            }
+
+            img.src = url;
+        });
+    }
 }
 
 module.exports = Media;

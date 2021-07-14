@@ -68,6 +68,22 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     }
 
     /**
+     * Restores the scroll position
+     */
+    async restoreScrollPosition() {
+        for(let image of this.element.querySelectorAll('img.widget--media__preview__source, img.widget--image')) {
+            await HashBrown.Entity.Resource.Media.waitForImage(image.src, true);   
+        }
+        
+        await new Promise((resolve) => { requestAnimationFrame(resolve); });
+        await new Promise((resolve) => { requestAnimationFrame(resolve); });
+        await new Promise((resolve) => { requestAnimationFrame(resolve); });
+        await new Promise((resolve) => { requestAnimationFrame(resolve); });
+
+        await super.restoreScrollPosition();
+    }
+
+    /**
      * Event: Clicked start tour
      */
     async onClickStartTour() {
