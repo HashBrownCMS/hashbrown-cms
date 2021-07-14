@@ -44,6 +44,9 @@ _.div({class: 'resource-editor resource-editor--media-editor'},
                 _.field({localized: true, label: 'Caption'},
                     _.text({disabled: model.isLocked, value: model.caption, onchange: _.onChangeCaption})
                 ),
+                _.field({localized: true, label: 'Description'},
+                    _.text({multiline: true, disabled: model.isLocked, value: model.description, onchange: _.onChangeDescription})
+                ),
                 _.field({localized: true, label: 'Author', size: 2},
                     _.field({localized: true, label: 'Name'},
                         _.text({disabled: model.isLocked, value: model.author.name, onchange: _.onChangeAuthorName})

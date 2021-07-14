@@ -6,7 +6,22 @@
  * @memberof HashBrown.Common.Entity.Resource
  */
 class Media extends HashBrown.Entity.Resource.ResourceBase {
-    get icon() { return this.isVideo() ? 'file-video-o' : this.isImage() ? 'file-image-o' : super.icon; }
+    get icon() {
+        if(this.isVideo()) {
+            return 'file-video-o';
+        }
+
+        if(this.isImage()) {
+            return 'file-image-o';
+        }
+
+
+        if(this.isAudio()) {
+            return 'file-audio-o';
+        }
+
+        return super.icon;
+    }
     
     /**
      * Structure
@@ -17,6 +32,7 @@ class Media extends HashBrown.Entity.Resource.ResourceBase {
         this.def(String, 'filename');
         this.def(String, 'folder', '/');
         this.def(String, 'caption');
+        this.def(String, 'description');
         this.def(Object, 'author', {});
         this.def(Object, 'copyrightHolder', {});
         this.def(Number, 'copyrightYear');

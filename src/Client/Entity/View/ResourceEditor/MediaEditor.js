@@ -206,6 +206,15 @@ class MediaEditor extends HashBrown.Entity.View.ResourceEditor.ResourceEditorBas
     }
     
     /**
+     * Event: Change description
+     */
+    onChangeDescription(newValue) {
+        this.model.description = newValue;
+    
+        this.onChange();
+    }
+    
+    /**
      * Event: Change author name
      */
     onChangeAuthorName(newValue) {
