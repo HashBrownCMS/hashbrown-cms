@@ -12,7 +12,7 @@ We have a few guides on using HashBrown CMS [here](https://github.com/HashBrownC
 
 ### Docker
 
-The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags). An example setup can be found [here](https://hashbrowncms.org/guides/docker).
+The easiest way to get up and running is to use the HashBrown CMS [Docker images](https://hub.docker.com/r/hashbrowncms/hashbrowncms/tags). An example setup can be found [here](https://github.com/HashBrownCMS/hashbrown-cms/wiki/Docker).
 
 The `latest` and `develop` images will automatically update themselves every time they're restarted.
 
